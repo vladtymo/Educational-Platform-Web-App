@@ -1,0 +1,83 @@
+﻿@model IPagedList<SS_EDUP.Core.DTO_s.CourseDetailDto>
+@{
+    ViewData["Title"] = "Courses";
+    Layout = "~/Views/Shared/_AdminPanelLayout.cshtml";
+}
+
+@using X.PagedList.Mvc;
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Web.Common;
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12 mt-4">
+            <div class="card mb-4">
+                <div class="card-header pb-0 p-3">
+                    <h6 class="mb-1">My courses</h6>
+                    <p class="text-sm">Show my all courses.</p>
+                    <a class="btn bg-gradient-primary w-15 px-3 mb-2 ms-2" asp-controller="Courses" asp-action="Create" data-class="bg-white">Add course</a>
+                </div>
+
+                <div class="card-body p-3">
+                    <div class="row">
+                        @foreach (var item in Model)
+                        {
+                            <div class="col-xl-3 col-md-6 mb-xl-0 mb-4" style="margin-bottom: 40px !important;">
+                                <div class="card card-blog card-plain">
+                                    <div class="position-relative">
+                                        <a class="d-block shadow-xl border-radius-xl">
+                                            @if (item.ImagePath == "https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-6.png")
+                                            {
+                                                <img src="@item.ImagePath" style="height: 276px; width: 100%;" class="img-fluid shadow border-radius-xl"  alt="user1">
+
+                                            }
+                                            else
+                                            {
+                                                <img src="~/images//courses/@item.ImagePath" style="height: 276px; width: 100%;" class="img-fluid shadow border-radius-xl" alt="user1">
+                                            }
+                                        </a>
+                                    </div>
+                                    <div class="card-body px-1 pb-0">
+                                       <p class="text-gradient text-dark mb-2 text-sm">@item.AuthorFullName</p>
+                                        <p>
+                                            <h5>
+                                                @item.Title
+                                            </h5>
+                                        </p>
+                                        <p class="mb-4 text-sm">
+                                            @Html.Raw(@item.Description)
+                                        </p>
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <a asp-controller="Courses" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary w-50 px-3 mb-2 ms-2" data-class="bg-white">Edit</a>
+                                                <a asp-controller="Courses" asp-action="Delete" asp-route-id="@item.Id" class="btn bg-gradient-primary w-50 px-3 mb-2 ms-2" data-class="bg-white">Delete</a>
+                                            <div class="avatar-group mt-2">
+@*                                                <button type="button" class="btn btn-outline-primary w-50 btn-sm mb-0">View Project</button>
+*@                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    }
+                    </div>
+                    <div class="row m-3">
+
+                        @Html.PagedListPager(Model, page => Url.Action("index", new { page = page }), new PagedListRenderOptions()
+                        {
+                        ActiveLiElementClass = "active",
+                        PageClasses = new[]{ "page-link"},
+                        LiElementClasses=new[] { "page-item" },
+                        UlElementClasses = new[] { "pagination","justify-content-center", "mt-3" },
+                        //LinkToNextPageFormat = "Next",
+                        //LinkToPreviousPageFormat = "Prev",
+                        MaximumPageNumbersToDisplay = 3,
+                        DisplayLinkToPreviousPage = PagedListDisplayMode.Never,
+                        DisplayLinkToNextPage = PagedListDisplayMode.Never
+                        })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

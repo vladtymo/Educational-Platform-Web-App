@@ -1,0 +1,43 @@
+﻿@*@model IEnumerable<SS_EDUP.Core.DTO_s.CourseDto>*@
+@model IEnumerable<SS_EDUP.Web.ViewModels.CourseCardViewModel>
+@inject SignInManager<AppUser> SignInManager;
+@using Microsoft.AspNetCore.Identity;
+@using SS_EDUP.Core.Entities;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    string productImagePlaceholder = @"https://www.pulsecarshalton.co.uk/wp-content/uploads/2016/08/jk-placeholder-image.jpg";
+}
+
+<div class="card">
+    <div class="card-header">My Cart</div>
+
+    <div class="card-body">
+        <h5 class="card-title">Courses List</h5>
+
+        <ul class="list-group list-group-flush">
+            @foreach (var course in @Model)
+            {
+                <li class="list-group-item">
+                    <img src="@(course.CourseDto.ImagePath ?? productImagePlaceholder)" height="80" alt="@course.CourseDto.Title">
+                    <span><strong> @course.CourseDto.Title</strong> </span>
+                    <span>@course.CourseDto.Price$</span>
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        if (course.IsLearning)
+                        {
+                            <a asp-controller="" asp-action="" asp-route-courseId="@course.CourseDto.Id" class="btn btn-outline-info btn-sm mb-0">In Progress</a>
+                        }
+                    }
+                    <span>  <a asp-controller="Cart" asp-action="Remove" asp-route-courseId="@course.CourseDto.Id" class="btn btn-primary">Delete</a></span>
+                </li>
+
+            }
+        </ul>
+        <div class="card-footer">
+            <p>Total Price: @Model.Where(x=>x.IsLearning==false).Sum(p=>p.CourseDto.Price)$</p>
+            <a asp-controller="Learning" asp-action="Add" asp-route-id="" class="btn btn-primary">Confirm</a>
+        </div>
+    </div>
+</div>

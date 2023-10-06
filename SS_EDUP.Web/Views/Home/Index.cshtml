@@ -1,0 +1,153 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using SS_EDUP.Core.Entities;
+
+@inject SignInManager<AppUser> SignInManager
+
+@model IPagedList<SS_EDUP.Web.ViewModels.CourseCardViewModel>
+@using X.PagedList.Mvc;
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Web.Common;
+@*@using PagedList;
+@using PagedList.Mvc;*@
+
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-3">
+            <ul class="nav flex-column">
+                @foreach (var category in @ViewBag.ListCategories)
+                {
+                    <li class="nav-item">
+                         <a class="btn @(category.Equals(ViewBag.SelectCategory) ? "nav-link active": "nav-link")" aria-current="page" asp-action="Index" asp-route-categoryId="@category.Id">@category.Name</a>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="col-9">
+            <div class="container">
+                <div class="row">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">Category</a></li>
+                            <li class="breadcrumb-item active" aria-current="page"> @ViewBag.SelectCategory</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="row">
+                    <div class="col-12 mt-4">
+
+                        <div class="card mb-4">
+                            <div class="card-body p-3">
+                                <div class="row">
+                                    @foreach (var course in Model)
+                                    {
+                                        <div class="col-xl-3 col-md-6 mb-xl-0 mb-4">
+                                            <div class="card card-blog card-plain">
+                                                <div class="position-relative">
+                                                    <a class="d-block shadow-xl border-radius-xl">
+                                                        @if (course.CourseDto.ImagePath == "https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-6.png")
+                                                        {
+                                                            <img src="@course.CourseDto.ImagePath" class="img-fluid shadow border-radius-xl" alt="user1">
+                                                        }
+                                                        else
+                                                        {
+                                                            <img src="~/images//courses/@course.CourseDto.ImagePath" class="img-fluid shadow border-radius-xl" alt="user1">
+                                                        }
+                                                    </a>
+                                                </div>
+                                                <div class="card-body px-1 pb-0">
+                                                    <p class="text-gradient text-dark mb-2 text-sm">@course.CourseDto.CategoryName</p>
+                                                    <a href="javascript:;">
+                                                        <h5>
+                                                            @course.CourseDto.Title
+                                                        </h5>
+                                                    </a>
+                                                    <p class="mb-4 text-sm">
+                                                        @course.CourseDto.AuthorFullName
+                                                    </p>
+                                                    <p class="mb-4 text-sm">
+                                                        @Html.Raw(@course.CourseDto.Description)
+                                                    </p>
+                                                    <p class="mb-4 text-sm">
+                                                        @course.CourseDto.Price UAH
+                                                    </p>
+                                                    <div class="d-flex align-items-center justify-content-between">
+
+                                                        @if (SignInManager.IsSignedIn(User))
+                                                        {
+                                                            if (course.IsLearning)
+                                                            {
+                                                                <a asp-controller="" asp-action=""  asp-route-courseId="@course.CourseDto.Id" class="btn btn-outline-info btn-sm mb-0">In Progress</a>
+                                                            }
+                                                            else {
+
+                                                                @if (!course.IsInCart)
+                                                                {
+                                                                    <a asp-controller="Cart" asp-action="Add" asp-route-courseId="@course.CourseDto.Id" class="btn btn-outline-primary btn-sm mb-0">Add Cart</a>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <a asp-controller="Cart" asp-action="Remove" asp-route-courseId="@course.CourseDto.Id" class="btn btn-outline-secondary btn-sm mb-0">Delete Cart</a>
+                                                                }
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            @if (!course.IsInCart)
+                                                            {
+                                                                <a asp-controller="Cart" asp-action="Add" asp-route-courseId="@course.CourseDto.Id" class="btn btn-outline-primary btn-sm mb-0">Add Cart</a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <a asp-controller="Cart" asp-action="Remove" asp-route-courseId="@course.CourseDto.Id" class="btn btn-outline-secondary btn-sm mb-0">Delete Cart</a>
+                                                            }
+                                                        }
+
+
+                                                        @*<a asp-controller="Cart" asp-action="Add" asp-route-courseId="@course.CourseDto.Id" class="btn btn-outline-primary btn-sm mb-0">Start Course @course.CourseDto.Id</a>*@
+                                                        <div class="avatar-group mt-2">
+                                                            <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Elena Morison">
+                                                                <img alt="Image placeholder" src="../assets/img/team-1.jpg">
+                                                            </a>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <div class="row m-3">
+
+                    @Html.PagedListPager(Model, page => Url.Action("index", new { page = page }), new PagedListRenderOptions()
+                    {
+                    ActiveLiElementClass = "active",
+                    PageClasses = new[]{ "page-link"},
+                    LiElementClasses=new[] { "page-item" },
+                    UlElementClasses = new[] { "pagination","justify-content-center", "mt-3" },
+                    //LinkToNextPageFormat = "Next",
+                    //LinkToPreviousPageFormat = "Prev",
+                    MaximumPageNumbersToDisplay = 3,
+                    DisplayLinkToPreviousPage = PagedListDisplayMode.Never,
+                    DisplayLinkToNextPage = PagedListDisplayMode.Never
+                    })
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
